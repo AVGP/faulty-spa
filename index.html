@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<body>
+  <template id="main">
+    <article>
+      <h2>Main page</h2>
+    </article>
+  </template>
+  <template id="kitten">
+    <article>
+      <h2>Kitten</h2>
+      <img src="https://placekitten.com/500/500" alt="Cute kitty">    
+    </article>
+  </template>
+  
+  <h1>Faulty SPA</h1>
+  <a href="./">Main page</a> &nbsp;
+  <a href="./kitten">Kitten</a>  
+  <main></main>
+  
+  <script>
+    var mainTpl = document.getElementById('main').content,
+        kittenTpl = document.getElementById('kitten').content;
+
+    var mainElem = document.querySelector('main');
+
+    function handleClick(evt) {
+      var destination = evt.target.getAttribute('href');
+      mainElem.removeChild(mainElem.children[0]);
+      setContent(destination);
+      history.pushState(destination, evt.target.textContent, destination);
+
+      return evt.preventDefault();
+    }
+
+    function setContent(path) {
+      if (path === './') mainElem.appendChild(document.importNode(mainTpl, true));
+      else mainElem.appendChild(document.importNode(kittenTpl, true));
+    }
+
+    window.addEventListener('popstate', function (evt) {
+      mainElem.removeChild(mainElem.children[0]);
+      setContent(evt.state);
+    })
+
+    if (window.location.pathname.split('/').reverse()[0] === '') {
+      history.replaceState('./', 'Main page', './');
+      setContent('./');
+    } else {
+      history.replaceState('./kitten', 'Kitten', '/kitten');
+      setContent('./kitten');
+    }
+
+    Array.from(document.getElementsByTagName('a')).forEach(function(linkEl) {
+      linkEl.addEventListener('click', handleClick, true)
+    })
+
+  </script>
+</body>
+</html>
